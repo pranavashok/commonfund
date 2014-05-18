@@ -1,0 +1,48 @@
+Stakeholder
+------------
+ID, Name
+
+Bills
+------
+BillID, StakeholderID, Amount
+
+BillDetails
+------------
+BillID, Date, Particulars
+
+
+
+Create New User
+----------------
+
+INSERT INTO stakeholder VALUES(DEFAULT, 'Pranav')
+INSERT INTO stakeholder VALUES(DEFAULT, 'Amith')
+INSERT INTO stakeholder VALUES(DEFAULT, 'Navaneeth')
+INSERT INTO stakeholder VALUES(DEFAULT, 'Chetan')
+INSERT INTO stakeholder VALUES(DEFAULT, 'Praveen')
+
+
+Find Total for a particular bill
+---------------------------------
+SELECT Date, Particulars, SUM(Amount) AS Total FROM billing 
+JOIN billdetails ON billing.BillID = billdetails.BillID AND Valid = 1
+GROUP BY billing.BillID
+
+How much a person has spent
+----------------------------
+SELECT Name, SUM(Amount) AS Spent FROM billing 
+JOIN stakeholder ON StakeholderID = ID
+WHERE Valid = 1 GROUP BY StakeholderID
+
+How much a person needs to give to common account = Per Head Cost - Spent
+-------------------------------------------------------------------------
+SELECT Name, SUM(Amount-Average) AS Balance FROM billing
+JOIN (
+SELECT b.BillID, AVG(Amount) AS Average
+FROM billing b
+JOIN billdetails ON b.BillID = billdetails.BillID
+WHERE Valid =1
+GROUP BY b.BillID) AS j
+ON j.BillID = billing.BillID
+JOIN stakeholder s ON StakeholderID = ID
+GROUP BY StakeholderID
